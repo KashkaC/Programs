@@ -62,7 +62,26 @@ public class WebWorker implements Runnable
 			InputStream is = socket.getInputStream();
 			OutputStream os = socket.getOutputStream();
 			readHTTPRequest(is);
-			writeHTTPHeader(os, "text/html");
+//			String cntyp="text/html";
+//			switch(cntyp) {
+//			
+//			case "text/html" :
+//				writeHTTPHeader(os, "text/html");
+//				break;
+//				
+//			case "image/gif" :
+//				writeHTTPHeader(os, "image/gif");
+//				break;
+//				
+//			case "image/jpeg" :
+//				writeHTTPHeader(os, "image/jpeg");
+//				break;
+//				
+//			case "image/png" :
+//				writeHTTPHeader(os, "image/png");
+//				break;
+//			}
+			writeHTTPHeader(os, "image/png");
 			writeContent(os);
 			os.flush();
 			socket.close();
@@ -132,9 +151,6 @@ public class WebWorker implements Runnable
 		os.write("Date: ".getBytes());
 		os.write((df.format(d)).getBytes());
 		os.write("\n".getBytes());
-		os.write("Server: Jon's very own server\n".getBytes());
-		// os.write("Last-Modified: Wed, 08 Jan 2003 23:11:55 GMT\n".getBytes());
-		// os.write("Content-Length: 438\n".getBytes());
 		os.write("Connection: close\n".getBytes());
 		os.write("Content-Type: ".getBytes());
 		os.write(contentType.getBytes());
@@ -151,8 +167,9 @@ public class WebWorker implements Runnable
 	 **/
 	private void writeContent(OutputStream os) throws Exception
 	{
-		String line= "";
+		
 		String []line2= new String[1000];
+		int readByte;
 		if(hp) {
 			os.write("<html><head></head><body>\n".getBytes());
 			os.write("<h3>Kashka's server</h3>\n".getBytes());
@@ -175,7 +192,7 @@ public class WebWorker implements Runnable
 			DateFormat df = DateFormat.getDateTimeInstance();
 			df.setTimeZone(TimeZone.getTimeZone("GMT"));
 			BufferedReader Br= new BufferedReader(new FileReader(fr));
-			
+			readByte=Br.read();
 			String csdate="<cs371date>";
 			String csServer="<cs371server>";
 			
@@ -191,10 +208,16 @@ public class WebWorker implements Runnable
 					os.write(str2.getBytes());
 				}
 				else
-				
-				os.write(line2[i].getBytes());
+				while(readByte!=-1) {
+					os.write(readByte);
+					readByte=Br.read();
+				}
+				//os.write(line2[i].getBytes());
 			}
 			Br.close();
+
+			
+			
 		} catch(IOException e) {
 			e.printStackTrace();
 		}
